@@ -1,0 +1,2 @@
+class ExchangeRatesApiException(Exception):
+    pass
