@@ -8,18 +8,18 @@ from django.db import models
 USD = 'USD'
 EUR = 'EUR'
 RUB = 'RUB'
-GPB = 'GPB'
+GBP = 'GBP'
 CURRENCIES = {
     USD,
     EUR,
     RUB,
-    GPB,
+    GBP,
 }
 CURRENCY_TYPES = (
     (USD, 'USD'),
     (EUR, 'EUR'),
     (RUB, 'RUB'),
-    (GPB, 'GPB'),
+    (GBP, 'GBP'),
 )
 
 
