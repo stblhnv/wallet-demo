@@ -11,6 +11,7 @@ djangorestframework = "^3.11"
 pytest-django = "^3.8"
 psycopg2 = "^2.8"
 requests = "^2.22"
+pytest-mock = "^2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
