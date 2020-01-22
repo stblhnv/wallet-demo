@@ -11,7 +11,7 @@ def create_user_and_wallet(
         password: str,
         currency: str,
         init_balance: Decimal,
-) -> CustomUser:
+) -> None:
     # Предположим, что юзер может существовать без
     # кошелька, поэтому не оборачиваем в
     # transaction.atomic()
@@ -27,4 +27,3 @@ def create_user_and_wallet(
         )
     except WalletCreationException:
         pass
-    return user

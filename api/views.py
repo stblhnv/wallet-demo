@@ -23,7 +23,7 @@ class UserRegistrationView(APIView):
                 )
                 return Response(
                     {
-                        'message': 'User and wallet are successfully created',
+                        'message': 'User is successfully created',
                         'status': HTTP_201_CREATED,
                     },
                     status=HTTP_201_CREATED,
