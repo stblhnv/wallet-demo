@@ -7,7 +7,7 @@ from django.db import models
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, email: str, password: str, **extra_fields) -> 'User':
+    def create_user(self, email: str, password: str, **extra_fields) -> 'CustomUser':
         if not email:
             raise ValueError('User must have an email address')
 
@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, email: str, password: str, **extra_fields) -> 'User':
+    def create_superuser(self, email: str, password: str, **extra_fields) -> 'CustomUser':
         if not email:
             raise ValueError('Superuser must have an email address')
 

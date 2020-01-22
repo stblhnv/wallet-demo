@@ -1,8 +1,14 @@
 import pytest
+from decimal import Decimal
 
-from wallet.exceptions import ExchangeRateCreationException
+from customauth.services import create_user
+from wallet.exceptions import (
+    ExchangeRateCreationException,
+    WalletCreationException,
+)
 from wallet.services import (
     create_exchange_rate,
+    create_wallet,
     update_exchange_rates,
 )
 
@@ -48,3 +54,58 @@ def test_update_exchange_rates__proper_call__called_4_times(mocker):
     # assert
     assert create_exchange_rate_mocker.call_count == 4
     assert get_exchange_rates_mocker.call_count == 4
+
+
+@pytest.mark.django_db
+def test_create_wallet__proper_call__wallet_created():
+    # arrange
+    user = create_user(
+        email='test@test.com',
+        password='test',
+    )
+
+    # act
+    wallet = create_wallet(
+        user=user,
+        currency='USD',
+        init_balance=Decimal(1000.555),
+    )
+
+    # assert
+    assert wallet.balance == Decimal('1000.55')
+    assert wallet.owner is user
+    assert wallet.currency == 'USD'
+
+
+@pytest.mark.django_db
+def test_create_wallet__wrong_currency__raise_exception():
+    # arrange
+    user = create_user(
+        email='test@test.com',
+        password='test',
+    )
+
+    # act & assert
+    with pytest.raises(WalletCreationException):
+        create_wallet(
+            user=user,
+            currency='SBM',
+            init_balance=Decimal(1000.0),
+        )
+
+
+@pytest.mark.django_db
+def test_create_wallet__negative_initial_balance__raise_exception():
+    # arrange
+    user = create_user(
+        email='test@test.com',
+        password='test',
+    )
+
+    # act & assert
+    with pytest.raises(WalletCreationException):
+        create_wallet(
+            user=user,
+            currency='USD',
+            init_balance=Decimal(-10.0),
+        )
