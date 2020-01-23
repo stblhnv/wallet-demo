@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from wallet.models import Transaction
+
 
 class MoneyTransferSerializer(serializers.Serializer):
 
@@ -16,3 +18,16 @@ class MoneyTransferSerializer(serializers.Serializer):
         max_digits=11,
         decimal_places=2,
     )
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Transaction
+        fields = [
+            'sender',
+            'recipient',
+            'amount',
+            'exchange_rate',
+            'created_at',
+        ]

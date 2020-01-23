@@ -5,7 +5,7 @@ from customauth.services import create_user
 from wallet.exceptions import (
     ExchangeRateCreationException,
     WalletCreationException,
-    WalletTransmitMoneyException,
+    WalletOperationException,
 )
 from wallet.models import (
     ExchangeRate,
@@ -20,6 +20,7 @@ from wallet.services import (
     decrease_wallet_balance,
     get_current_exchange_rate,
     increase_wallet_balance,
+    retrieve_transactions_by_wallet_id,
     transfer_money_between_wallets,
     update_exchange_rates,
 )
@@ -165,7 +166,7 @@ def test_decrease_wallet_balance__negative_amount__raise_exception():
     )
 
     # act & assert
-    with pytest.raises(WalletTransmitMoneyException):
+    with pytest.raises(WalletOperationException):
         decrease_wallet_balance(wallet=wallet, amount=Decimal(-5.01))
 
 
@@ -183,7 +184,7 @@ def test_decrease_wallet_balance__too_big_transfer__raise_exception():
     )
 
     # act & assert
-    with pytest.raises(WalletTransmitMoneyException):
+    with pytest.raises(WalletOperationException):
         decrease_wallet_balance(wallet=wallet, amount=Decimal(-95.01))
 
 
@@ -221,7 +222,7 @@ def test_increase_wallet_balance__negative_amount__raise_exception():
     )
 
     # act & assert
-    with pytest.raises(WalletTransmitMoneyException):
+    with pytest.raises(WalletOperationException):
         increase_wallet_balance(wallet=wallet, amount=Decimal(-5.01))
 
 
@@ -386,7 +387,7 @@ def test_transfer_money_between_wallets__not_wallet_owner__raise_exception(mocke
     )
 
     # act & assert
-    with pytest.raises(WalletTransmitMoneyException):
+    with pytest.raises(WalletOperationException):
         transfer_money_between_wallets(
             sender=user_1,
             sender_wallet_id=wallet_2.pk,
@@ -484,3 +485,69 @@ def test_transfer_money_between_wallets__unable_to_increase__raise_excpetion(moc
     # assert
     assert wallet_1.balance == Decimal('50.00')
     assert wallet_2.balance == Decimal('0.00')
+
+
+@pytest.mark.django_db
+def test_retrieve_transactions_by_wallet_id__proper_call__return_transactions():
+    # arrange
+    user_1 = create_user(
+        email='test1@test.com',
+        password='test1',
+    )
+    user_2 = create_user(
+        email='test2@test.com',
+        password='test2',
+    )
+    wallet_1 = create_wallet(
+        user=user_1,
+        currency='USD',
+        init_balance=Decimal(50),
+    )
+    wallet_2 = create_wallet(
+        user=user_2,
+        currency='RUB',
+        init_balance=Decimal(0),
+    )
+    create_transaction(
+        sender=wallet_1,
+        recipient=wallet_2,
+        amount=Decimal(10.0),
+        exchange_rate=Decimal(63.54691),
+    )
+    create_transaction(
+        sender=wallet_1,
+        recipient=wallet_2,
+        amount=Decimal(30.0),
+        exchange_rate=Decimal(61.33420),
+    )
+    create_transaction(
+        sender=wallet_2,
+        recipient=wallet_1,
+        amount=Decimal(300.0),
+        exchange_rate=Decimal(0.01598),
+    )
+
+    # act
+    transactions = retrieve_transactions_by_wallet_id(
+        user=user_1,
+        wallet_id=wallet_1.pk,
+    )
+
+    # assert
+    assert len(transactions) == 3
+
+
+@pytest.mark.django_db
+def test_retrieve_transactions_by_wallet_id__user_do_not_own_wallet__raise_exception():
+    # arrange
+    user_1 = create_user(
+        email='test1@test.com',
+        password='test1',
+    )
+
+    # act & assert
+    with pytest.raises(WalletOperationException):
+        retrieve_transactions_by_wallet_id(
+            user=user_1,
+            wallet_id=100,
+        )
