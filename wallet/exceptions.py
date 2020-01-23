@@ -6,5 +6,5 @@ class WalletCreationException(Exception):
     pass
 
 
-class WalletTransmitMoneyException(Exception):
+class WalletOperationException(Exception):
     pass
