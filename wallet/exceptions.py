@@ -4,3 +4,7 @@ class ExchangeRateCreationException(Exception):
 
 class WalletCreationException(Exception):
     pass
+
+
+class WalletTransmitMoneyException(Exception):
+    pass
