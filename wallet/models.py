@@ -55,6 +55,9 @@ class Wallet(models.Model):
         help_text='Активен',
     )
 
+    def __str__(self):
+        return f'{self.owner}: #{self.pk}({self.currency})'
+
 
 class ExchangeRate(models.Model):
 
