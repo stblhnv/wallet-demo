@@ -10,6 +10,7 @@ from rest_framework.test import (
 from api.views import (
     TransmitMoneyView,
     UserRegistrationView,
+    WalletTransactionsView,
 )
 from customauth.models import CustomUser
 from customauth.services import create_user
@@ -161,7 +162,7 @@ def test_transfer_money__amount_unfilled__return_400_and_exception_raised(mocker
         email='test@test.com',
         password='test',
     )
-    transfer_money_between_wallets = mocker.patch(
+    transfer_money_between_wallets_mocker = mocker.patch(
         'api.views.transfer_money_between_wallets',
     )
     client = APIRequestFactory()
@@ -183,4 +184,182 @@ def test_transfer_money__amount_unfilled__return_400_and_exception_raised(mocker
     # assert
     assert response.status_code == 400
     assert response.data['status'] == 400
-    transfer_money_between_wallets.assert_not_called()
+    transfer_money_between_wallets_mocker.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_transfer_money__proper_call__return_200_and_message(mocker):
+    # arrange
+    user_1 = create_user(
+        email='test@test.com',
+        password='test',
+    )
+    user_2 = create_user(
+        email='test2@test.com',
+        password='test2',
+    )
+    wallet_1 = create_wallet(
+        user=user_1,
+        currency='USD',
+        init_balance=Decimal(50),
+    )
+    wallet_2 = create_wallet(
+        user=user_2,
+        currency='RUB',
+        init_balance=Decimal(0),
+    )
+    transfer_money_between_wallets_mocker = mocker.patch(
+        'api.views.transfer_money_between_wallets',
+    )
+    client = APIRequestFactory()
+    data = {
+        'sender': wallet_1.pk,
+        'recipient': wallet_2.pk,
+        'amount': Decimal(40.5)
+    }
+    view = TransmitMoneyView.as_view()
+    request = client.post(
+        '/api/v1/transmit_money/',
+        data=data,
+        format='json',
+    )
+    force_authenticate(request, user=user_1)
+
+    # act
+    response = view(request)
+
+    # assert
+    assert response.status_code == 200
+    assert response.data['status'] == 200
+    transfer_money_between_wallets_mocker.assert_called_once_with(
+        sender=user_1,
+        sender_wallet_id=wallet_1.pk,
+        recipient_wallet_id=wallet_2.pk,
+        amount=Decimal(40.5),
+    )
+
+
+@pytest.mark.django_db
+def test_transactions__proper_call__return_200_and_transactions(mocker):
+    # arrange
+    user_1 = create_user(
+        email='test@test.com',
+        password='test',
+    )
+    user_2 = create_user(
+        email='test2@test.com',
+        password='test2',
+    )
+    wallet_1 = create_wallet(
+        user=user_1,
+        currency='USD',
+        init_balance=Decimal(50),
+    )
+    wallet_2 = create_wallet(
+        user=user_2,
+        currency='RUB',
+        init_balance=Decimal(0),
+    )
+    transaction_1 = create_transaction(
+        sender=wallet_1,
+        recipient=wallet_2,
+        amount=Decimal(10.0),
+        exchange_rate=Decimal(63.54691),
+    )
+    transaction_2 = create_transaction(
+        sender=wallet_1,
+        recipient=wallet_2,
+        amount=Decimal(30.0),
+        exchange_rate=Decimal(61.33420),
+    )
+    transaction_3 = create_transaction(
+        sender=wallet_2,
+        recipient=wallet_1,
+        amount=Decimal(300.0),
+        exchange_rate=Decimal(0.01598),
+    )
+    retrieve_transactions_by_wallet_id_mocker = mocker.patch(
+        'api.views.retrieve_transactions_by_wallet_id',
+        return_value=[
+            transaction_1,
+            transaction_2,
+            transaction_3,
+        ],
+    )
+    client = APIRequestFactory()
+    view = WalletTransactionsView.as_view()
+    request = client.get(
+        f'/api/v1/transactions/{wallet_1.pk}/',
+        format='json',
+    )
+    force_authenticate(request, user=user_1)
+
+    # act
+    response = view(request, wallet_1.pk)
+
+    # assert
+    assert response.status_code == 200
+    assert response.data['status'] == 200
+    assert len(response.data['transactions']) == 3
+    retrieve_transactions_by_wallet_id_mocker.assert_called_once_with(
+        user=user_1,
+        wallet_id=wallet_1.pk,
+    )
+
+
+@pytest.mark.django_db
+def test_transactions__empty_transaction__return_200_and_empty_list(mocker):
+    # arrange
+    user_1 = create_user(
+        email='test@test.com',
+        password='test',
+    )
+    retrieve_transactions_by_wallet_id_mocker = mocker.patch(
+        'api.views.retrieve_transactions_by_wallet_id',
+        return_value=[],
+    )
+    client = APIRequestFactory()
+    view = WalletTransactionsView.as_view()
+    request = client.get(
+        '/api/v1/transactions/100/',
+        format='json',
+    )
+    force_authenticate(request, user=user_1)
+
+    # act
+    response = view(request, 100)
+
+    # assert
+    assert response.status_code == 200
+    assert response.data['status'] == 200
+    assert response.data['transactions'] == []
+    retrieve_transactions_by_wallet_id_mocker.assert_called_once()
+
+
+@pytest.mark.django_db
+def test_transactions__exception_occured__return_400_and_error(mocker):
+    # arrange
+    user_1 = create_user(
+        email='test@test.com',
+        password='test',
+    )
+    retrieve_transactions_by_wallet_id_mocker = mocker.patch(
+        'api.views.retrieve_transactions_by_wallet_id',
+        side_effect=Exception,
+    )
+    client = APIRequestFactory()
+    view = WalletTransactionsView.as_view()
+    request = client.get(
+        '/api/v1/transactions/100/',
+        format='json',
+    )
+    force_authenticate(request, user=user_1)
+
+    # act
+    response = view(request, 100)
+
+    # assert
+    assert response.status_code == 400
+    assert response.data['status'] == 400
+    assert response.data['error'] is not None
+    retrieve_transactions_by_wallet_id_mocker.assert_called_once()
