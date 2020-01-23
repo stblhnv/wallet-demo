@@ -2,11 +2,21 @@ import pytest
 from decimal import Decimal
 
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import (
+    APIRequestFactory,
+    force_authenticate,
+)
 
-from api.views import UserRegistrationView
+from api.views import (
+    TransmitMoneyView,
+    UserRegistrationView,
+)
 from customauth.models import CustomUser
-
+from customauth.services import create_user
+from wallet.services import (
+    create_transaction,
+    create_wallet,
+)
 
 @pytest.mark.django_db
 def test_signin__unknown_user__return_bad_request():
@@ -142,3 +152,35 @@ def test_signup__email_unfilled__return_400_and_exception_raised(mocker):
     assert response.status_code == 400
     assert response.data['status'] == 400
     create_user_and_wallet_mocker.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_transfer_money__amount_unfilled__return_400_and_exception_raised(mocker):
+    # arrange
+    user = create_user(
+        email='test@test.com',
+        password='test',
+    )
+    transfer_money_between_wallets = mocker.patch(
+        'api.views.transfer_money_between_wallets',
+    )
+    client = APIRequestFactory()
+    data = {
+        'sender': 100,
+        'recipient': 101,
+    }
+    view = TransmitMoneyView.as_view()
+    request = client.post(
+        '/api/v1/transmit_money/',
+        data=data,
+        format='json',
+    )
+    force_authenticate(request, user=user)
+
+    # act
+    response = view(request)
+
+    # assert
+    assert response.status_code == 400
+    assert response.data['status'] == 400
+    transfer_money_between_wallets.assert_not_called()
