@@ -86,7 +86,7 @@ DATABASES = {
         'NAME': 'wallet_demo_db',
         'USER': 'postgresql_user',
         'PASSWORD': 'postgresql_password',
-        'HOST': '127.0.0.1',
+        'HOST': 'db',
         'PORT': '5432',
     },
 }
