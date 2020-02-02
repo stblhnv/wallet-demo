@@ -8,13 +8,14 @@ authors = ["Stanislav Balahonov <stblhnv@gmail.com>"]
 python = "^3.7"
 django = "2.2"
 djangorestframework = "^3.11"
-pytest-django = "^3.8"
 psycopg2 = "^2.8"
 requests = "^2.22"
-pytest-mock = "^2.0"
+django-apscheduler = "^0.3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
+pytest-django = "^3.8"
+pytest-mock = "^2.0"
 
 [build-system]
 requires = ["poetry>=0.12"]

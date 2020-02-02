@@ -1,5 +1,19 @@
 [[package]]
 category = "main"
+description = "In-process task scheduler with Cron-like capabilities"
+name = "apscheduler"
+optional = false
+python-versions = "*"
+version = "3.6.3"
+
+[package.dependencies]
+pytz = "*"
+setuptools = ">=0.7"
+six = ">=1.4.0"
+tzlocal = ">=1.2"
+
+[[package]]
+category = "dev"
 description = "Atomic file writes."
 name = "atomicwrites"
 optional = false
@@ -7,7 +21,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "1.3.0"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Classes Without Boilerplate"
 name = "attrs"
 optional = false
@@ -31,7 +45,7 @@ python-versions = "*"
 version = "3.0.4"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Cross-platform colored terminal text."
 marker = "sys_platform == \"win32\""
 name = "colorama"
@@ -53,6 +67,18 @@ sqlparse = "*"
 
 [[package]]
 category = "main"
+description = "APScheduler for Django"
+name = "django-apscheduler"
+optional = false
+python-versions = "*"
+version = "0.3.0"
+
+[package.dependencies]
+apscheduler = ">=3.2.0"
+django = ">=1.11"
+
+[[package]]
+category = "main"
 description = "Web APIs for Django, made easy."
 name = "djangorestframework"
 optional = false
@@ -71,7 +97,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "2.8"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Read metadata from Python packages"
 marker = "python_version < \"3.8\""
 name = "importlib-metadata"
@@ -83,7 +109,7 @@ version = "1.4.0"
 zipp = ">=0.5"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "More routines for operating on iterables, beyond itertools"
 name = "more-itertools"
 optional = false
@@ -91,7 +117,7 @@ python-versions = ">=3.5"
 version = "8.1.0"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "plugin and hook calling mechanisms for python"
 name = "pluggy"
 optional = false
@@ -112,7 +138,7 @@ python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 version = "2.8.4"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "library with cross-python path, ini-parsing, io, code, log facilities"
 name = "py"
 optional = false
@@ -120,7 +146,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 version = "1.8.1"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "pytest: simple powerful testing with Python"
 name = "pytest"
 optional = false
@@ -138,7 +164,7 @@ setuptools = "*"
 six = ">=1.10.0"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "A Django plugin for pytest."
 name = "pytest-django"
 optional = false
@@ -149,7 +175,7 @@ version = "3.8.0"
 pytest = ">=3.6"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Thin-wrapper around the mock package for easier use with py.test"
 name = "pytest-mock"
 optional = false
@@ -199,6 +225,17 @@ version = "0.3.0"
 
 [[package]]
 category = "main"
+description = "tzinfo object for the local timezone"
+name = "tzlocal"
+optional = false
+python-versions = "*"
+version = "2.0.0"
+
+[package.dependencies]
+pytz = "*"
+
+[[package]]
+category = "main"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 name = "urllib3"
 optional = false
@@ -206,7 +243,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4"
 version = "1.25.7"
 
 [[package]]
-category = "main"
+category = "dev"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 marker = "python_version < \"3.8\""
 name = "zipp"
@@ -218,16 +255,18 @@ version = "2.0.0"
 more-itertools = "*"
 
 [metadata]
-content-hash = "3f567e8b2426c1fe5bde82985ad2c6997ef961effc0b1e92ee747526e5ecd02e"
+content-hash = "3cf68c98f06abfbeea5fb78c8a89872d2953a970f78b89c8ffe31080e5a9c396"
 python-versions = "^3.7"
 
 [metadata.hashes]
+apscheduler = ["3bb5229eed6fbbdafc13ce962712ae66e175aa214c69bed35a06bffcf0c5e244", "e8b1ecdb4c7cb2818913f766d5898183c7cb8936680710a4d3a966e02262e526"]
 atomicwrites = ["03472c30eb2c5d1ba9227e4c2ca66ab8287fbfbbda3888aa93dc2e28fc6811b4", "75a9445bac02d8d058d5e1fe689654ba5a6556a1dfd8ce6ec55a0ed79866cfa6"]
 attrs = ["08a96c641c3a74e44eb59afb61a24f2cb9f4d7188748e76ba4bb5edfa3cb7d1c", "f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"]
 certifi = ["017c25db2a153ce562900032d5bc68e9f191e44e9a0f762f373977de9df1fbb3", "25b64c7da4cd7479594d035c08c2d809eb4aab3a26e5a990ea98cc450c320f1f"]
 chardet = ["84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae", "fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"]
 colorama = ["7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff", "e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"]
 django = ["7c3543e4fb070d14e10926189a7fcf42ba919263b7473dceaefce34d54e8a119", "a2814bffd1f007805b19194eb0b9a331933b82bd5da1c3ba3d7b7ba16e06dc4b"]
+django-apscheduler = ["a2530736793064c54b3d5a62fc3844cdc4b0535d8988cd9248375c71441d2152"]
 djangorestframework = ["05809fc66e1c997fd9a32ea5730d9f4ba28b109b9da71fccfa5ff241201fd0a4", "e782087823c47a26826ee5b6fa0c542968219263fb3976ec3c31edab23a4001f"]
 idna = ["c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407", "ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"]
 importlib-metadata = ["bdd9b7c397c273bcc9a11d6629a38487cd07154fa255a467bf704cd2c258e359", "f17c015735e1a88296994c0697ecea7e11db24290941983b08c9feb30921e6d8"]
@@ -242,5 +281,6 @@ pytz = ["1c557d7d0e871de1f5ccd5833f60fb2550652da6be2693c1e02300743d21500d", "b02
 requests = ["11e007a8a2aa0323f5a921e9e6a2d7e4e67d9877e85773fba9ba6419025cbeb4", "9cf5292fcd0f598c671cfc1e0d7d1a7f13bb8085e9a590f48c010551dc6c4b31"]
 six = ["236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a", "8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"]
 sqlparse = ["40afe6b8d4b1117e7dff5504d7a8ce07d9a1b15aeeade8a2d10f130a834f8177", "7c3dca29c022744e95b547e867cee89f4fce4373f3549ccd8797d8eb52cdb873"]
+tzlocal = ["11c9f16e0a633b4b60e1eede97d8a46340d042e67b670b290ca526576e039048", "949b9dd5ba4be17190a80c0268167d7e6c92c62b30026cf9764caf3e308e5590"]
 urllib3 = ["a8a318824cc77d1fd4b2bec2ded92646630d7fe8619497b142c84a9e6f5a7293", "f3c5fd51747d450d4dcf6f923c81f78f811aab8205fda64b0aba34a4e48b0745"]
 zipp = ["57147f6b0403b59f33fd357f169f860e031303415aeb7d04ede4839d23905ab8", "7ae5ccaca427bafa9760ac3cd8f8c244bfc259794b5b6bb9db4dda2241575d09"]

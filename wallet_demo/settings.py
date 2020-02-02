@@ -37,10 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_apscheduler',
     'rest_framework',
     'rest_framework.authtoken',
     'api',
     'customauth',
+    'scheduler',
     'wallet',
 ]
 
@@ -84,7 +86,7 @@ DATABASES = {
         'NAME': 'wallet_demo_db',
         'USER': 'postgresql_user',
         'PASSWORD': 'postgresql_password',
-        'HOST': '127.0.0.1',
+        'HOST': 'db',
         'PORT': '5432',
     },
 }
