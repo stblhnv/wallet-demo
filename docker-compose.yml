@@ -20,7 +20,12 @@ services:
       - 8000:8000
     depends_on:
       - db
-    links:
+
+  scheduler:
+    build: .
+    command: sh -c "python manage.py runscheduler"
+    depends_on:
+      - web
       - db
 
 volumes:
