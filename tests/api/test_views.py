@@ -98,7 +98,7 @@ def test_signup__proper_call__return_200_and_message(mocker):
 
 
 @pytest.mark.django_db
-def test_signup__value_error__return_400_and_exception_text(mocker):
+def test_signup__value_error__return_500_and_exception_text(mocker):
     # arrange
     client = APIRequestFactory()
     data = {
@@ -123,7 +123,7 @@ def test_signup__value_error__return_400_and_exception_text(mocker):
     response = view(request)
 
     # assert
-    assert response.status_code == 400
+    assert response.status_code == 500
     assert response.data['error'] == 'Something went wrong'
 
 
@@ -186,6 +186,41 @@ def test_transfer_money__amount_unfilled__return_400_and_exception_raised(mocker
     assert response.status_code == 400
     assert response.data['status'] == 400
     transfer_money_between_wallets_mocker.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_transfer_money__internal_error__return_500_and_exception_text(mocker):
+    # arrange
+    user = create_user(
+        email='test@test.com',
+        password='test',
+    )
+    transfer_money_between_wallets_mocker = mocker.patch(
+        'api.views.transfer_money_between_wallets',
+        side_effect=ValueError('Something went wrong'),
+    )
+    client = APIRequestFactory()
+    data = {
+        'sender': 100,
+        'recipient': 101,
+        'amount': Decimal(40.5)
+    }
+    view = TransmitMoneyView.as_view()
+    request = client.post(
+        '/api/v1/transmit_money/',
+        data=data,
+        format='json',
+    )
+    force_authenticate(request, user=user)
+
+    # act
+    response = view(request)
+
+    # assert
+    assert response.status_code == 500
+    assert response.data['status'] == 500
+    assert response.data['error'] == 'Something went wrong'
+    transfer_money_between_wallets_mocker.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -338,7 +373,7 @@ def test_transactions__empty_transaction__return_200_and_empty_list(mocker):
 
 
 @pytest.mark.django_db
-def test_transactions__exception_occured__return_400_and_error(mocker):
+def test_transactions__exception_occured__return_500_and_error(mocker):
     # arrange
     user_1 = create_user(
         email='test@test.com',
@@ -360,7 +395,7 @@ def test_transactions__exception_occured__return_400_and_error(mocker):
     response = view(request, 100)
 
     # assert
-    assert response.status_code == 400
-    assert response.data['status'] == 400
+    assert response.status_code == 500
+    assert response.data['status'] == 500
     assert response.data['error'] is not None
     retrieve_transactions_by_wallet_id_mocker.assert_called_once()
