@@ -1,9 +1,10 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
+    HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
-    HTTP_200_OK,
+    HTTP_500_INTERNAL_SERVER_ERROR,
 )
 from rest_framework.views import APIView
 
@@ -23,8 +24,8 @@ class UserRegistrationView(APIView):
 
     def post(self, request):
         input_serializer = UserRegistrationSerializer(data=request.data)
-        try:
-            if input_serializer.is_valid(raise_exception=True):
+        if input_serializer.is_valid():
+            try:
                 create_user_and_wallet(
                     email=input_serializer.validated_data['email'],
                     password=input_serializer.validated_data['password1'],
@@ -38,14 +39,21 @@ class UserRegistrationView(APIView):
                     },
                     status=HTTP_201_CREATED,
                 )
-        except Exception as error:
-            return Response(
-                {
-                    'error': str(error),
-                    'status': HTTP_400_BAD_REQUEST,
-                },
-                status=HTTP_400_BAD_REQUEST,
-            )
+            except Exception as error:
+                return Response(
+                    {
+                        'error': str(error),
+                        'status': HTTP_500_INTERNAL_SERVER_ERROR,
+                    },
+                    status=HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+        return Response(
+            {
+                'error': input_serializer.errors,
+                'status': HTTP_400_BAD_REQUEST,
+            },
+            status=HTTP_400_BAD_REQUEST,
+        )
 
 
 class TransmitMoneyView(APIView):
@@ -56,8 +64,8 @@ class TransmitMoneyView(APIView):
 
     def post(self, request):
         input_serializer = MoneyTransferSerializer(data=request.data)
-        try:
-            if input_serializer.is_valid(raise_exception=True):
+        if input_serializer.is_valid():
+            try:
                 transaction = transfer_money_between_wallets(
                     sender=request.user,
                     sender_wallet_id=input_serializer.validated_data['sender'],
@@ -73,14 +81,21 @@ class TransmitMoneyView(APIView):
                     },
                     status=HTTP_200_OK,
                 )
-        except Exception as error:
-            return Response(
-                {
-                    'error': str(error),
-                    'status': HTTP_400_BAD_REQUEST,
-                },
-                status=HTTP_400_BAD_REQUEST,
-            )
+            except Exception as error:
+                return Response(
+                    {
+                        'error': str(error),
+                        'status': HTTP_500_INTERNAL_SERVER_ERROR,
+                    },
+                    status=HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+        return Response(
+            {
+                'error': input_serializer.errors,
+                'status': HTTP_400_BAD_REQUEST,
+            },
+            status=HTTP_400_BAD_REQUEST,
+        )
 
 
 class WalletTransactionsView(APIView):
@@ -109,7 +124,7 @@ class WalletTransactionsView(APIView):
             return Response(
                 {
                     'error': str(error),
-                    'status': HTTP_400_BAD_REQUEST,
+                    'status': HTTP_500_INTERNAL_SERVER_ERROR,
                 },
-                status=HTTP_400_BAD_REQUEST,
+                status=HTTP_500_INTERNAL_SERVER_ERROR,
             )
