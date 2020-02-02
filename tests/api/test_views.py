@@ -19,6 +19,7 @@ from wallet.services import (
     create_wallet,
 )
 
+
 @pytest.mark.django_db
 def test_signin__unknown_user__return_bad_request():
     # arrange
