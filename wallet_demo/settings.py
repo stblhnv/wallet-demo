@@ -25,7 +25,7 @@ SECRET_KEY = 'sowm8zvxm&ioz5c4jat3+f6(d^qp$-!^(3@=p9d=fzpfchxud)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -84,8 +84,8 @@ DATABASES = {
         'NAME': 'wallet_demo_db',
         'USER': 'postgresql_user',
         'PASSWORD': 'postgresql_password',
-        'HOST': '127.0.0.1',
-        'PORT': '5433',
+        'HOST': 'db',
+        'PORT': '5432',
     },
 }
 

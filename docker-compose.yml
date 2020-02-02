@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+
+  db:
+    image: postgres:12.1-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgresql_user
+      POSTGRES_PASSWORD: postgresql_password
+      POSTGRES_DB: wallet_demo_db
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+
+  web:
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    links:
+      - db
+
+volumes:
+  pg_data:
